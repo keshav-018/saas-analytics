@@ -1,0 +1,232 @@
+.project-assistant {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 100;
+  font-family: inherit;
+}
+
+.project-assistant-trigger {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-left: auto;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.22);
+  cursor: pointer;
+}
+
+.project-assistant-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(25rem, calc(100vw - 2rem));
+  height: min(35rem, calc(100dvh - 7rem));
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.2);
+}
+
+.project-assistant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-assistant-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.project-assistant-avatar {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: var(--bg-primary);
+  color: var(--color-primary);
+}
+
+.project-assistant-heading h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.project-assistant-heading p {
+  margin: 0.2rem 0 0;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.project-assistant-close,
+.project-assistant-form button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.project-assistant-close:hover {
+  background: var(--accent);
+}
+
+.project-assistant-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.project-assistant-welcome {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.project-assistant-welcome > p {
+  margin: 0 0 0.85rem;
+}
+
+.project-assistant-suggestions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.project-assistant-suggestions button {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  background: var(--card);
+  color: var(--card-foreground);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.project-assistant-suggestions button:hover {
+  border-color: var(--primary);
+  background: var(--muted);
+}
+
+.project-assistant-message {
+  max-width: 88%;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.85rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.project-assistant-message.user {
+  align-self: flex-end;
+  border-bottom-right-radius: 0.25rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.project-assistant-message.model {
+  align-self: flex-start;
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 0.25rem;
+  background: var(--muted);
+}
+
+.project-assistant-message.typing {
+  color: var(--muted-foreground);
+}
+
+.project-assistant-error {
+  margin: 0;
+  color: var(--color-error);
+  font-size: 0.8rem;
+}
+
+.project-assistant-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.project-assistant-form input {
+  min-width: 0;
+  flex: 1;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: var(--light-background);
+  color: var(--light-secondary-foreground);
+  caret-color: var(--light-secondary-foreground);
+  opacity: 1;
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.project-assistant-form input::placeholder {
+  color: var(--light-muted-foreground);
+  opacity: 1;
+}
+
+.project-assistant-form input:hover:not(:disabled),
+.project-assistant-form input:focus {
+  border-color: var(--primary);
+}
+
+.project-assistant-form input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+html.dark .project-assistant-form input {
+  background: var(--dark-background);
+  color: var(--dark-card-foreground);
+  caret-color: var(--dark-card-foreground);
+}
+
+html.dark .project-assistant-form input::placeholder {
+  color: var(--dark-muted-foreground);
+}
+
+.project-assistant-form button {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.project-assistant-form button:disabled,
+.project-assistant-suggestions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 480px) {
+  .project-assistant {
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .project-assistant-panel {
+    width: calc(100vw - 2rem);
+  }
+}
