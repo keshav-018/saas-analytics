@@ -110,6 +110,20 @@
   overflow: hidden;
 }
 
+button.sidenav-link {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.sidenav-link:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .sidenav-link:hover {
   background-color: var(--accent);
   color: var(--accent-foreground);

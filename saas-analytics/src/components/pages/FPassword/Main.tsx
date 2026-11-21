@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Mail, ArrowLeft, CheckCircle, AlertCircle, BarChart3 } from 'lucide-react'
-import { ForgotPasswordFormData, ForgotPasswordResponse } from './Types'
+import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import type { ForgotPasswordFormData } from './Types'
 import './Main.css'
 
 export const ForgotPassword = () => {
@@ -46,44 +47,28 @@ export const ForgotPassword = () => {
     }
 
     try {
-      // Simulate API call - in a real app, this would be an actual API endpoint
-      const response = await mockForgotPasswordApi(formData)
-      
-      if (response.success) {
-        setSuccess(true)
-        setEmailSent(formData.email)
-        setFormData({ email: '' })
-      } else {
-        setError(response.message || 'Failed to send reset instructions')
+      const supabase = createClient()
+      const redirectTo = new URL('/auth/callback?next=/update-password', window.location.origin).toString()
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        formData.email.trim(),
+        { redirectTo },
+      )
+
+      if (resetError) {
+        setError(resetError.message || 'Unable to send reset instructions. Please try again.')
+        return
       }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
+
+      setSuccess(true)
+      setEmailSent(formData.email.trim())
+      setFormData({ email: '' })
+    } catch {
+      setError('Unable to connect to the authentication service. Please try again.')
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Mock API function - replace with actual API call
-  const mockForgotPasswordApi = async (data: ForgotPasswordFormData): Promise<ForgotPasswordResponse> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    // Mock validation - check if email exists in the system
-    const validEmails = ['admin@example.com', 'user@example.com']
-    
-    if (validEmails.includes(data.email)) {
-      return {
-        success: true,
-        message: 'Reset instructions sent successfully'
-      }
-    }
-    
-    // For security reasons, we don't reveal if the email exists or not
-    return {
-      success: true,
-      message: 'If this email exists in our system, you will receive reset instructions'
-    }
-  }
 
   return (
     <div className="forgot-password-container">

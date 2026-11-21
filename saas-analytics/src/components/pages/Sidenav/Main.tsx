@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { 
   BarChart3, 
   Users, 
@@ -17,10 +17,14 @@ import { SidenavProps, NavItem } from './Types'
 import './Main.css'
 import Image from 'next/image'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 export const Sidenav = ({ isOpen, onToggle }: SidenavProps) => {
   const pathname = usePathname();
+  const router = useRouter()
   const [mounted, setMounted] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [logoutError, setLogoutError] = useState('')
 
   useEffect(() => {
     setMounted(true);
@@ -64,6 +68,28 @@ export const Sidenav = ({ isOpen, onToggle }: SidenavProps) => {
   const current = mounted
     ? (navItems.find(item => pathname === item.href)?.id ?? 'dashboard')
     : null;
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    setLogoutError('')
+
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        setLogoutError('Unable to log out. Please try again.')
+        setIsLoggingOut(false)
+        return
+      }
+
+      router.replace('/')
+      router.refresh()
+    } catch {
+      setLogoutError('Unable to connect to the authentication service.')
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <>
@@ -123,10 +149,11 @@ export const Sidenav = ({ isOpen, onToggle }: SidenavProps) => {
         </div>
 
         <div className="sidenav-footer">
-          <Link href="/logout" className="sidenav-link">
+          <button type="button" onClick={handleLogout} disabled={isLoggingOut} className="sidenav-link">
             <span className="sidenav-icon"><LogOut size={20} /></span>
-            {isOpen && <span className="sidenav-label">Logout</span>}
-          </Link>
+            {isOpen && <span className="sidenav-label">{isLoggingOut ? 'Logging out…' : 'Logout'}</span>}
+          </button>
+          {logoutError && <p role="alert" className="sidenav-label">{logoutError}</p>}
         </div>
       </nav>
 

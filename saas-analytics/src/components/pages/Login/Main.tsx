@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Eye, EyeOff, Mail, Lock, AlertCircle, BarChart3 } from 'lucide-react'
-import { LoginFormData, LoginResponse } from './Types'
+import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import type { LoginFormData } from './Types'
 import './Main.css'
 
 export const Login = () => {
@@ -47,46 +48,34 @@ export const Login = () => {
     }
 
     try {
-      // Simulate API call - in a real app, this would be an actual API endpoint
-      const response = await mockLoginApi(formData)
-      
-      if (response.success && response.token) {
-        // Store token (in a real app, you'd use secure storage)
-        localStorage.setItem('admin_token', response.token)
-        if (formData.rememberMe) {
-          localStorage.setItem('rememberMe', 'true')
+      const supabase = createClient()
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: formData.email.trim(),
+        password: formData.password,
+      })
+
+      if (authError) {
+        if (authError.status === 429) {
+          setError('Too many sign-in attempts. Please wait a moment and try again.')
+        } else if (authError.message.toLowerCase().includes('email not confirmed')) {
+          setError('Please confirm your email address before signing in.')
+        } else if (authError.status === 400) {
+          setError('The email address or password is incorrect.')
+        } else {
+          setError(authError.message || 'Unable to sign in. Please try again.')
         }
-        
-        // Redirect to dashboard
-        router.push('/dashboard')
-      } else {
-        setError(response.message || 'Login failed')
+        return
       }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
+
+      router.replace('/dashboard')
+      router.refresh()
+    } catch {
+      setError('Unable to connect to the authentication service. Please try again.')
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Mock API function - replace with actual API call
-  const mockLoginApi = async (data: LoginFormData): Promise<LoginResponse> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    // Mock validation - in real app, this would be server-side
-    if (data.email === 'admin@example.com' && data.password === 'admin123') {
-      return {
-        success: true,
-        token: 'mock-jwt-token-' + Date.now()
-      }
-    }
-    
-    return {
-      success: false,
-      message: 'Invalid email or password'
-    }
-  }
 
   return (
     <div className="login-container">
@@ -194,12 +183,6 @@ export const Login = () => {
           </button>
         </form>
 
-        {/* Demo credentials */}
-        <div className="demo-credentials">
-          <p className="demo-title">Demo credentials:</p>
-          <p>Email: admin@example.com</p>
-          <p>Password: admin123</p>
-        </div>
       </div>
     </div>
   )
